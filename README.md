@@ -20,7 +20,7 @@ docker run --rm -it \
 Use this step to check, whether the machine's rgb this container runs on can be controlled using the container (should usually work, if openRGB itself works).
 
 ```shell
-docker exec -it doganm95-openrgb-server /sh
+docker exec -it doganm95-openrgb-server /bin/sh
 ```
 
 Then try changing the color of the device that is listed first, using this in the docker shell
