@@ -8,6 +8,7 @@ Currently only works on linux hosts. Useful to control e.g. a NAS server's led's
 ```shell
 docker run --rm -it \
     --privileged \
+    --name doganm95-openrgb-server
     --net=host \
     --device /dev/bus/usb:/dev/bus/usb \
     -v /sys:/sys:ro \
