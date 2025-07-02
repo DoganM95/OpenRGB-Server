@@ -3,7 +3,7 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install all needed dependencies for OpenRGB AppImage CLI (no GUI required)
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt update && apt install -y --no-install-recommends \
     wget \
     ca-certificates \
     libusb-1.0-0 \
@@ -34,8 +34,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxcb-xinput0 \
     libxcb-shm0 \
     libxcb-util1 \
-    libxcb-xtest0 \
-    && rm -rf /var/lib/apt/lists/*
+    libxcb-xtest0 
+    # && rm -rf /var/lib/apt/lists/*
 
 # Download OpenRGB 1.0rc1 AppImage
 RUN wget https://openrgb.org/releases/release_candidate_1.0rc1/OpenRGB_1.0rc1_x86_64_1fbacde.AppImage -O /usr/local/bin/OpenRGB.AppImage \
