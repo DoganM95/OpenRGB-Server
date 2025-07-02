@@ -1,0 +1,21 @@
+{
+  "name": "openrgb-server",
+  "version": "1.0.0",
+  "description": "A docker container that controls rgb of the components installed on the host machine, using cli or REST api.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DoganM95/OpenRGB-Server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/DoganM95/OpenRGB-Server/issues"
+  },
+  "homepage": "https://github.com/DoganM95/OpenRGB-Server#readme"
+}
