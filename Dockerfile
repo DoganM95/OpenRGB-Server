@@ -47,4 +47,4 @@ RUN apt install -y \
 WORKDIR /root
 
 # Start a bash shell when running the container
-CMD ["/bin/bash"]
+CMD ["/usr/local/bin/OpenRGB.AppImage", "--server"]
