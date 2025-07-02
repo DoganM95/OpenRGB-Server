@@ -20,6 +20,6 @@ RUN npm install
 COPY server.js ./
 
 # Expose REST API port
-EXPOSE 6744
+EXPOSE 3000
 
 CMD ["node", "/opt/openrgb-rest/server.js"]
