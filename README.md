@@ -1,45 +1,65 @@
+Here’s a polished and clearer version of your README with improved structure, grammar, and formatting:
+
+---
+
 # OpenRGB-Server
 
-Lets you control any device's rgb components, this container runs on using a containerized OpenRGB.
-Currently only works on linux hosts. Useful to control e.g. a NAS server's led's for status indication (temperature, RAM usage, etc in colors, brightness, etc.)
+This container runs OpenRGB in server mode, allowing you to control RGB components of any compatible device via network.
+**Currently, it only supports Linux hosts.**
+It is especially useful for managing RGB LEDs on devices such as NAS servers for status indication (e.g., temperature, RAM usage) through colors, brightness, and effects.
 
-## Run the tcp server
+---
 
-The tcp server runs the OpenRGB application's TCP server using its `--server` flag. It uses the TCP/IP protocol and needs [a client for control using network](https://gitlab.com/CalcProgrammer1/OpenRGB/-/blob/master/README.md#openrgb-sdk)
+## Run the TCP Server
 
-```shell
+This container runs the OpenRGB TCP server (`--server` flag), which communicates over TCP/IP.
+To control RGB devices remotely, you need a compatible OpenRGB client supporting the [OpenRGB SDK](https://gitlab.com/CalcProgrammer1/OpenRGB/-/blob/master/README.md#openrgb-sdk).
+
+This container handles hardware access, exposes the network interface, and provides CLI commands, making it a mandatory component for remote RGB control.
+
+```bash
 docker run -d \
-    --device /dev/bus/usb:/dev/bus/usb \
-    --name doganm95-openrgb-tcp-server \
-    --privileged \
-    --pull always \
-    -p 6742:6742 \
-    -v /sys:/sys:ro \
-    ghcr.io/doganm95/openrgb-tcp-server:latest
+  --device /dev/bus/usb:/dev/bus/usb \
+  --name openrgb-tcp-server \
+  --privileged \
+  --pull always \
+  -p 6742:6742 \
+  -v /sys:/sys:ro \
+  ghcr.io/doganm95/openrgb-tcp-server:latest
 ```
 
-### Test cli compatibility
+---
 
-Use this step to check, whether the machine's rgb this container runs on can be controlled using the container (should usually work, if openRGB itself works).
+### Test CLI Compatibility
 
-```shell
-docker exec -it doganm95-openrgb-tcp-server /bin/bash
-```
+Check if your machine's RGB devices can be controlled inside the container. If OpenRGB works on your host, this usually works too.
 
-Then try changing the color of the device that is listed first, using this in the docker shell
-The 6 digit hex after --color defines the color in Red, Green & Blue.
+1. Enter the container shell:
 
-```shell
-/opt/openrgb/AppRun -d 0 --mode static --color 00FF00 -v
-```
+   ```bash
+   docker exec -it openrgb-tcp-server /bin/bash
+   ```
 
+2. Change the color of the first listed device to green (`00FF00`):
 
-## Test container
+   ```bash
+   /opt/openrgb/AppRun -d 0 --mode static --color 00FF00 -v
+   ```
 
-```shell
+---
+
+## Test Container Environment
+
+Run a temporary container to test device permissions and USB access:
+
+```bash
 docker run --rm -it \
   --privileged \
   --device /dev/bus/usb:/dev/bus/usb \
   -v /sys:/sys:ro \
   ubuntu:22.04 /bin/bash
 ```
+
+---
+
+If you want, I can help you also prepare a README section for the HTTP REST API container or usage examples for clients.
