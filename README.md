@@ -29,3 +29,14 @@ The 6 digit hex after --color defines the color in Red, Green & Blue.
 ```shell
 /usr/local/bin/OpenRGB.AppImage -d 0 --mode static --color 00FF00 -v
 ```
+
+
+## Test container
+
+```shell
+docker run --rm -it \
+  --privileged \
+  --device /dev/bus/usb:/dev/bus/usb \
+  -v /sys:/sys:ro \
+  ubuntu:22.04 /bin/bash
+```
