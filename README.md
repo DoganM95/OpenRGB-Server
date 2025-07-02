@@ -34,7 +34,7 @@ docker run -d \
   --pull always \
   -p 3000:6744 \
   --restart always \
-  ghcr.io/doganm95/openrgb-tcp-server:latest
+  ghcr.io/doganm95/openrgb-http-server:latest
 ```
 
 - `-e "OPENRGB_HOST=<server>"`: `<server>` can be either an ip address (if running on another machine) or the name of the tcp-server container (if running on the same machine)
