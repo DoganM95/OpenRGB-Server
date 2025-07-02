@@ -14,7 +14,7 @@ This container handles hardware access, exposes the network interface, and provi
 ```bash
 docker run -d \
   --device /dev/bus/usb:/dev/bus/usb \
-  --name openrgb-tcp-server \
+  --name doganm95-openrgb-tcp-server \
   --privileged \
   --pull always \
   -p 6742:6742 \
@@ -29,7 +29,7 @@ Check if your machine's RGB devices can be controlled inside the container. If O
 1. Enter the container shell:
 
    ```bash
-   docker exec -it openrgb-tcp-server /bin/bash
+   docker exec -it doganm95-openrgb-tcp-server /bin/bash
    ```
 
 2. Change the color of the first listed device to green (`00FF00`):
