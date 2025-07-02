@@ -1,14 +1,8 @@
-Here’s a polished and clearer version of your README with improved structure, grammar, and formatting:
-
----
-
 # OpenRGB-Server
 
 This container runs OpenRGB in server mode, allowing you to control RGB components of any compatible device via network.
 **Currently, it only supports Linux hosts.**
 It is especially useful for managing RGB LEDs on devices such as NAS servers for status indication (e.g., temperature, RAM usage) through colors, brightness, and effects.
-
----
 
 ## Run the TCP Server
 
@@ -28,8 +22,6 @@ docker run -d \
   ghcr.io/doganm95/openrgb-tcp-server:latest
 ```
 
----
-
 ### Test CLI Compatibility
 
 Check if your machine's RGB devices can be controlled inside the container. If OpenRGB works on your host, this usually works too.
@@ -46,8 +38,6 @@ Check if your machine's RGB devices can be controlled inside the container. If O
    /opt/openrgb/AppRun -d 0 --mode static --color 00FF00 -v
    ```
 
----
-
 ## Test Container Environment
 
 Run a temporary container to test device permissions and USB access:
@@ -59,7 +49,5 @@ docker run --rm -it \
   -v /sys:/sys:ro \
   ubuntu:22.04 /bin/bash
 ```
-
----
 
 If you want, I can help you also prepare a README section for the HTTP REST API container or usage examples for clients.
