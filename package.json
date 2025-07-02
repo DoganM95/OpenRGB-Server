@@ -17,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/DoganM95/OpenRGB-Server/issues"
   },
-  "homepage": "https://github.com/DoganM95/OpenRGB-Server#readme"
+  "homepage": "https://github.com/DoganM95/OpenRGB-Server#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "net": "^1.0.2"
+  }
 }
