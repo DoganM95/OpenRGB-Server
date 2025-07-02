@@ -1,50 +1,37 @@
-# 78 MB: Baseimage
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 104 MB: Download OpenRGB 1.0rc1 AppImage
-RUN apt-get -o Acquire::ForceIPv4=true update && \
-    apt-get install -y --no-install-recommends curl ca-certificates && \
-    curl -L --retry 5 --retry-delay 3 \
-      https://openrgb.org/releases/release_candidate_1.0rc1/OpenRGB_1.0rc1_x86_64_1fbacde.AppImage \
-      -o /usr/local/bin/OpenRGB.AppImage && \
-    chmod +x /usr/local/bin/OpenRGB.AppImage
-    
-# 231 MB: Install all needed dependencies for OpenRGB AppImage CLI (no GUI required)
-RUN apt install -y \
-    libusb-1.0-0 \
-    libhidapi-libusb0 \
+# Install core packages and dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
     fuse \
-    libfuse2 \
+    libusb-1.0-0 \
     libgl1 \
-    libharfbuzz0b \
-    libx11-6 \
-    libx11-xcb1 \
-    libxcb1 \
-    libxext6 \
-    libxrender1 \
-    libxcb-glx0 \
-    libxcb-xinerama0 \
-    libxcb-xfixes0 \
-    libxcb-shape0 \
-    libxcb-randr0 \
-    libxcb-sync1 \
-    libxkbcommon0 \
-    libxkbcommon-x11-0 \
-    libfontconfig1 \
-    libglib2.0-0 \
-    libxcb-icccm4 \
-    libxcb-image0 \
-    libxcb-keysyms1 \
-    libxcb-render-util0 \
-    libxcb-xinput0 \
-    libxcb-shm0 \
-    libxcb-util1 \
-    libxcb-xtest0 
-    # && rm -rf /var/lib/apt/lists/*
+    libharfbuzz0b
 
-WORKDIR /root
+# Install latest stable Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - && \
+    apt-get install -y nodejs 
 
-# Start a bash shell when running the container
-CMD ["/usr/local/bin/OpenRGB.AppImage", "--server"]
+# Download and prepare OpenRGB AppImage
+RUN curl -L --retry 5 --retry-delay 3 \
+    https://openrgb.org/releases/release_candidate_1.0rc1/OpenRGB_1.0rc1_x86_64_1fbacde.AppImage \
+    -o /usr/local/bin/OpenRGB.AppImage && \
+    chmod +x /usr/local/bin/OpenRGB.AppImage
+
+# Set working dir and copy everything in one go
+WORKDIR /opt/openrgb-rest
+COPY ./package*.json .
+COPY ./server.js .
+
+# Install Node.js dependencies
+RUN npm install
+
+# Expose OpenRGB SDK and REST API ports
+EXPOSE 6742
+EXPOSE 6744
+
+# Start OpenRGB server and REST API
+CMD [ "sh", "-c", "/usr/local/bin/OpenRGB.AppImage --server & sleep 2 && node /opt/openrgb-rest/server.js" ]
