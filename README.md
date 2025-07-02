@@ -3,7 +3,9 @@
 Lets you control any device's rgb components, this container runs on using a containerized OpenRGB.
 Currently only works on linux hosts. Useful to control e.g. a NAS server's led's for status indication (temperature, RAM usage, etc in colors, brightness, etc.)
 
-## Run the container
+## Run the tcp server
+
+The tcp server runs the OpenRGB application's TCP server using its `--server` flag. It uses the TCP/IP protocol and needs [a client for control using network](https://gitlab.com/CalcProgrammer1/OpenRGB/-/blob/master/README.md#openrgb-sdk)
 
 ```shell
 docker run -d \
