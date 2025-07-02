@@ -1,9 +1,11 @@
 const net = require("net");
 const express = require("express");
+const morgan = require("morgan");
 require("dotenv").config({ path: __dirname + "/.env" });
 
 const app = express();
 app.use(express.json());
+app.use(morgan("combined"));
 
 const OPENRGB_HOST = process.env.OPENRGB_HOST || "doganm95-openrgb-tcp-server";
 const OPENRGB_PORT = Number(process.env.OPENRGB_PORT) || 6742;
