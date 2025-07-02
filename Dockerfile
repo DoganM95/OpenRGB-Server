@@ -44,4 +44,5 @@ RUN apt install -y \
 
 WORKDIR /root
 
-CMD ["tail", "-f", "/dev/null"]
+# Start a bash shell when running the container
+CMD ["/bin/bash"]
