@@ -1,5 +1,7 @@
 # OpenRGB-Server
-A docker container that controls rgb of the components installed on the host machine, using cli or REST api.
+
+Lets you control any device's rgb components, this container runs on using a containerized OpenRGB.
+Currently only works on linux hosts. Useful to control e.g. a NAS server's led's for status indication (temperature, RAM usage, etc in colors, brightness, etc.)
 
 ## Run the container
 
