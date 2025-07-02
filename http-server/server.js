@@ -4,8 +4,9 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 
-const OPENRGB_HOST = process.env.OPENRGB_HOST || "127.0.0.1";
+const OPENRGB_HOST = process.env.OPENRGB_HOST || "doganm95-openrgb-tcp-server";
 const OPENRGB_PORT = Number(process.env.OPENRGB_PORT) || 6742;
+
 const PacketType = { HELLO: 0, REQUEST: 1, RESPONSE: 2, NOTIFY: 3, ERROR: 4 };
 
 const Command = {
