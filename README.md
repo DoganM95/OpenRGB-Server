@@ -24,7 +24,8 @@ docker exec -it doganm95-openrgb-server /sh
 ```
 
 Then try changing the color of the device that is listed first, using this in the docker shell
+The 6 digit hex after --color defines the color in Red, Green & Blue.
 
 ```shell
-/usr/local/bin/OpenRGB.AppImage --cli -d 0 --mode static --color 00FF00 -v
+/usr/local/bin/OpenRGB.AppImage -d 0 --mode static --color 00FF00 -v
 ```
