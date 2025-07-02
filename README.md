@@ -29,7 +29,7 @@ This container serves as a client for the TCP server, by providing a REST API to
 
 ```bash
 docker run -d \
-  -e "OPENRGB_HOST=doganm95-openrgb-tcp-server"
+  -e "OPENRGB_HOST=doganm95-openrgb-tcp-server" \
   --name doganm95-openrgb-http-server \
   --pull always \
   -p 3000:6744 \
