@@ -3,13 +3,15 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Download OpenRGB 1.0rc1 AppImage
-RUN apt-get update && apt-get install -y curl && \
-    curl -L https://openrgb.org/releases/release_candidate_1.0rc1/OpenRGB_1.0rc1_x86_64_1fbacde.AppImage -o /usr/local/bin/OpenRGB.AppImage && \
+RUN apt-get -o Acquire::ForceIPv4=true update && \
+    apt-get install -y --no-install-recommends curl ca-certificates && \
+    curl -L --retry 5 --retry-delay 3 \
+      https://openrgb.org/releases/release_candidate_1.0rc1/OpenRGB_1.0rc1_x86_64_1fbacde.AppImage \
+      -o /usr/local/bin/OpenRGB.AppImage && \
     chmod +x /usr/local/bin/OpenRGB.AppImage
     
 # Install all needed dependencies for OpenRGB AppImage CLI (no GUI required)
 RUN apt install -y \
-    ca-certificates \
     libusb-1.0-0 \
     libhidapi-libusb0 \
     fuse \
