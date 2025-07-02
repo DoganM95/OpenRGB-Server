@@ -11,7 +11,7 @@ docker run --rm -it \
     --net=host \
     --device /dev/bus/usb:/dev/bus/usb \
     -v /sys:/sys:ro \
-    openrgb-server:latest
+    ghcr.io/doganm95/openrgb-server:latest
 ```
 
 ### Test cli compatibility
