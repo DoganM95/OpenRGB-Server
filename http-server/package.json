@@ -4,6 +4,7 @@
   "description": "A docker container that controls rgb of the components installed on the host machine, using cli or REST api.",
   "main": "index.js",
   "scripts": {
+    "start": "node .\\server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,6 +20,7 @@
   },
   "homepage": "https://github.com/DoganM95/OpenRGB-Server#readme",
   "dependencies": {
+    "dotenv": "^17.0.1",
     "express": "^5.1.0",
     "net": "^1.0.2"
   }
