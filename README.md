@@ -7,7 +7,7 @@ Currently only works on linux hosts. Useful to control e.g. a NAS server's led's
 
 ```shell
 docker run --rm -it \
-    -p 6742:6742
+    -p 6742:6742 \
     --privileged \
     --name doganm95-openrgb-server \
     --device /dev/bus/usb:/dev/bus/usb \
