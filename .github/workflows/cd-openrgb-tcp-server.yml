@@ -38,12 +38,12 @@ jobs:
             - name: Build and push docker images
               uses: docker/build-push-action@v5
               with:
-                  context: .
+                  context: ./tcp-server
                   push: true
                   tags: |
-                      ghcr.io/doganm95/openrgb-server${{ env.TAG_SUFFIX }}:v${{ github.run_number }}
-                      ghcr.io/doganm95/openrgb-server${{ env.TAG_SUFFIX }}:${{ github.sha }}
-                      ghcr.io/doganm95/openrgb-server${{ env.TAG_SUFFIX }}:latest
+                      ghcr.io/doganm95/openrgb-tcp-server${{ env.TAG_SUFFIX }}:v${{ github.run_number }}
+                      ghcr.io/doganm95/openrgb-tcp-server${{ env.TAG_SUFFIX }}:${{ github.sha }}
+                      ghcr.io/doganm95/openrgb-tcp-server${{ env.TAG_SUFFIX }}:latest
                   labels: |
                       org.opencontainers.image.source=${{ github.repository_url }}
                       org.opencontainers.image.revision=${{ github.sha }}
