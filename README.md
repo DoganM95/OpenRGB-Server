@@ -22,3 +22,9 @@ Use this step to check, whether the machine's rgb this container runs on can be 
 ```shell
 docker exec -it doganm95-openrgb-server /sh
 ```
+
+Then try changing the color of the device that is listed first, using this in the docker shell
+
+```shell
+/usr/local/bin/OpenRGB.AppImage --cli -d 0 --mode static --color 00FF00 -v
+```
