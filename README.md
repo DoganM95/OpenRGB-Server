@@ -18,9 +18,26 @@ docker run -d \
   --privileged \
   --pull always \
   -p 6742:6742 \
+  --restart always \
   -v /sys:/sys:ro \
   ghcr.io/doganm95/openrgb-tcp-server:latest
 ```
+
+## Run the HTTP server
+
+This container serves as a client for the TCP server, by providing a REST API to the user.
+
+```bash
+docker run -d \
+  -e "OPENRGB_HOST=doganm95-openrgb-tcp-server"
+  --name doganm95-openrgb-http-server \
+  --pull always \
+  -p 3000:6744 \
+  --restart always \
+  ghcr.io/doganm95/openrgb-tcp-server:latest
+```
+
+- `-e "OPENRGB_HOST=<server>"`: `<server>` can be either an ip address (if running on another machine) or the name of the tcp-server container (if running on the same machine)
 
 ### Test CLI Compatibility
 
