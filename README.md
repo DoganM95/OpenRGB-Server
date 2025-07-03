@@ -39,6 +39,8 @@ docker run -it \
 ```
 
 - `-e "OPENRGB_HOST=<server>"`: `<server>` can be either an ip address (if running on another machine) or the name of the tcp-server container (if running on the same machine)
+- `-e "OPENRGB_PORT=<port>"`: `<port>` defines the port the tcp server serves on, in the example above exposed as `6742`
+- `-p x:3000`: `x` defines the port this http server should be accessible on, in this case 6744
 
 ### Test CLI Compatibility
 
