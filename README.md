@@ -69,5 +69,3 @@ docker run --rm -it \
   -v /sys:/sys:ro \
   ubuntu:22.04 /bin/bash
 ```
-
-If you want, I can help you also prepare a README section for the HTTP REST API container or usage examples for clients.
