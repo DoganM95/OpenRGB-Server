@@ -1,4 +1,4 @@
-# OpenRGB-Server
+# Intro
 
 This container runs OpenRGB in server mode, allowing you to control RGB components of any compatible device via network.
 **Currently, it only supports Linux hosts.**
