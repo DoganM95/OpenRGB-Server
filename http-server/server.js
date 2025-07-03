@@ -76,6 +76,7 @@ app.post("/devices/:id/color-all", async (req, res) => {
     res.status(200).json({ color: colorArray });
 });
 
+// TODO
 // POST /devices/:id/zone/:zoneId – set zone color(s)
 // Body: { colors: [...], fast?: boolean }
 app.post("/devices/:id/zone/:zoneId", async (req, res) => {
@@ -89,6 +90,7 @@ app.post("/devices/:id/zone/:zoneId", async (req, res) => {
     res.status(200).json({ zone: zoneId });
 });
 
+// TODO
 // POST /devices/:id/profile – load or save profile
 // Body: { profile: name_or_index, save?: boolean }
 app.post("/devices/:id/profile", async (req, res) => {
