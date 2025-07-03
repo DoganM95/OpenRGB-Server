@@ -2,10 +2,10 @@ name: Unified Docker Build for GHCR
 
 on:
     push:
-        paths-ignore:
-            - "README.md" # Ignore changes to README.md
+        paths:
+            - "tcp-server/**" # Only trigger if something under http-server/ changed
         branches-ignore:
-            - "*dependabot*" # Ignore branches containing "dependabot"
+            - "*dependabot*"
 
 jobs:
     build-and-push-to-ghcr:
