@@ -28,11 +28,12 @@ docker run -d \
 This container serves as a client for the TCP server, by providing a REST API to the user.
 
 ```bash
-docker run -d \
-  -e "OPENRGB_HOST=doganm95-openrgb-tcp-server" \
+docker run -it \
+  -e "OPENRGB_HOST=10.0.0.200" \
+  -e "OPENRGB_PORT=6742" \
   --name doganm95-openrgb-http-server \
   --pull always \
-  -p 3000:6744 \
+  -p 6744:3000 \
   --restart always \
   ghcr.io/doganm95/openrgb-http-server:latest
 ```
