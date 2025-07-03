@@ -1,4 +1,3 @@
-# Dockerfile.restapi
 FROM ubuntu:22.04
 
 # Install Node.js (latest stable)
