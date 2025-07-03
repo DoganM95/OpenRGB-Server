@@ -60,7 +60,7 @@ Check if your machine's RGB devices can be controlled inside the container. If O
 
 ## Test Container Environment
 
-Run a temporary container to test device permissions and USB access:
+For docker compatibility checks, run a temporary container to test device permissions and USB access:
 
 ```bash
 docker run --rm -it \
