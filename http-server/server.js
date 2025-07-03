@@ -39,7 +39,6 @@ app.get("/devices/:id", async (req, res) => {
     res.status(200).json(await client.getControllerData(id));
 });
 
-// TODO
 // POST /devices/:id/mode – set native mode
 // Body: { mode: <id or name>, save?: boolean }
 app.post("/devices/:id/mode", async (req, res) => {
@@ -55,15 +54,14 @@ app.post("/devices/:id/mode", async (req, res) => {
 // Body: { colors: [{r,g,b}, ...] } or { color: "#ff00aa" }
 app.post("/devices/:id/leds", async (req, res) => {
     const id = parseInt(req.params.id);
-    let color;
-    let colors;
-    if (req.body.color) color = req.body.color;
-    if (req.body.colors) colors = req.body.colors;
-    if (!colors && color) {
-        colors = Array(req.body.count || 1).fill(utils.hexColor(color));
+    const ledIndex = parseInt(req.body.ledIndex);
+    if (req.body.color) {
+        await client.updateSingleLed(id, ledIndex, req.body.color);
+    } else if (req.body.colors) {
+        colors = Array(req.body.count || 1).fill(utils.hexColor(req.body.color));
+        await client.updateLeds(id, req.body.colors);
     }
-    await client.updateLeds(id, colors);
-    res.status(200).json({ leds: colors.length });
+    res.status(200).json({ leds: req.body.colors?.length || 1 });
 });
 
 // TODO
@@ -73,8 +71,9 @@ app.post("/devices/:id/color-all", async (req, res) => {
     const id = parseInt(req.params.id);
     const c = req.body.color;
     const color = typeof c === "string" ? utils.hexColor(c) : utils.color(c.red, c.green, c.blue);
-    await client.setColor(color, id);
-    res.status(200).json({ color });
+    const colorArray = Array.from(color);
+    await client.updateLeds(id, colorArray);
+    res.status(200).json({ color: colorArray });
 });
 
 // POST /devices/:id/zone/:zoneId – set zone color(s)
