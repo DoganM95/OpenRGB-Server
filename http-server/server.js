@@ -13,14 +13,14 @@ const client = new Client("OpenRGB-REST-API", parseInt(process.env.OPENRGB_PORT)
 app.use(async (req, res, next) => {
     try {
         await client.connect();
-        req.body.devices = await client.getAllControllerData();
+        req.devices = await client.getAllControllerData();
     } catch (err) {
         return res.status(500).json({ error: "Failed to connect to OpenRGB: " + err.message });
     }
 
     res.on("finish", async () => {
         try {
-            await client.disconnect();
+            client.disconnect();
         } catch {
             // ignore disconnect errors
         }
@@ -31,23 +31,33 @@ app.use(async (req, res, next) => {
 
 // GET /devices – list all devices
 app.get("/devices", async (req, res) => {
-    res.status(200).json(req.body.devices);
+    res.status(200).json(req.devices);
 });
 
-// GET /devices/:id – get single device info
+// GET /devices/:id – get all information of a single device
 app.get("/devices/:id", async (req, res) => {
-    const requestedDeviceId = parseInt(req.params.id);
-    res.status(200).json(req.body.devices.filter((device) => device.deviceId == requestedDeviceId));
+    try {
+        const requestedDeviceId = parseInt(req.params.id);
+        res.status(200).json(req.devices.filter((device) => device.deviceId == requestedDeviceId));
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(err.message);
+    }
 });
 
 // POST /devices/:id/mode – set native mode
 // Body: { mode: <id or name>, save?: boolean }
 app.post("/devices/:id/mode", async (req, res) => {
-    const id = parseInt(req.params.id);
-    const { mode, save = false } = req.body;
-    await client.updateMode(id, mode);
-    if (save) await client.saveMode(id);
-    res.status(200).json({ mode, saved: save });
+    try {
+        const id = parseInt(req.params.id);
+        const { mode, save = false } = req.body;
+        await client.updateMode(id, mode);
+        if (save) await client.saveMode(id);
+        res.status(200).json({ mode, saved: save });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(err.message);
+    }
 });
 
 // POST /devices/:id/leds – set a specific device's specific led
@@ -63,7 +73,7 @@ app.post("/devices/:id/led", async (req, res) => {
         res.status(200).json({ leds: req.body.colors?.length || 1 });
     } catch (err) {
         console.error(err);
-        return res.status(500);
+        res.status(500).send(err.message);
     }
 });
 
@@ -81,7 +91,7 @@ app.post("/devices/:id/leds", async (req, res) => {
         res.status(200).json({ deviceId: deviceId, deviceName: deviceName, leds: ledCount, color: { red: red, green: green, blue: blue } });
     } catch (err) {
         console.error(err);
-        return res.status(500);
+        res.status(500).send(err.message);
     }
 });
 
@@ -89,40 +99,55 @@ app.post("/devices/:id/leds", async (req, res) => {
 // POST /devices/:id/color-all – set same color everywhere
 // Body: { color: "#00ff00" or {r,g,b} }
 app.post("/devices/:id/color-all", async (req, res) => {
-    const id = parseInt(req.params.id);
-    const c = req.body.color;
-    const color = typeof c === "string" ? utils.hexColor(c) : utils.color(c.red, c.green, c.blue);
-    const colorArray = Array.from(color);
-    await client.updateLeds(id, colorArray);
-    res.status(200).json({ color: colorArray });
+    try {
+        const id = parseInt(req.params.id);
+        const c = req.body.color;
+        const color = typeof c === "string" ? utils.hexColor(c) : utils.color(c.red, c.green, c.blue);
+        const colorArray = Array.from(color);
+        await client.updateLeds(id, colorArray);
+        res.status(200).json({ color: colorArray });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(err.message);
+    }
 });
 
 // TODO
 // POST /devices/:id/zone/:zoneId – set zone color(s)
 // Body: { colors: [...], fast?: boolean }
 app.post("/devices/:id/zone/:zoneId", async (req, res) => {
-    const id = parseInt(req.params.id);
-    const zoneId = parseInt(req.params.zoneId);
-    const { colors, fast = false } = req.body;
-    const device = (await client.getAllControllerData())[id];
-    const zone = device.zones.find((z) => z.id === zoneId);
-    if (!zone) throw new Error("Zone not found");
-    await client.updateZoneColors(id, zoneId, colors, fast);
-    res.status(200).json({ zone: zoneId });
+    try {
+        const id = parseInt(req.params.id);
+        const zoneId = parseInt(req.params.zoneId);
+        const { colors, fast = false } = req.body;
+        const device = (await client.getAllControllerData())[id];
+        const zone = device.zones.find((z) => z.id === zoneId);
+        if (!zone) throw new Error("Zone not found");
+        await client.updateZoneColors(id, zoneId, colors, fast);
+        res.status(200).json({ zone: zoneId });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(err.message);
+    }
 });
 
 // TODO
 // POST /devices/:id/profile – load or save profile
 // Body: { profile: name_or_index, save?: boolean }
 app.post("/devices/:id/profile", async (req, res) => {
-    const id = parseInt(req.params.id);
-    const { profile, save = false } = req.body;
-    if (save) {
-        await client.saveProfile(profile, false);
-        res.status(200).json({ saved: profile });
-    } else {
-        await client.loadProfile(profile, false);
-        res.status(200).json({ loaded: profile });
+    try {
+        const id = parseInt(req.params.id);
+        const { profile, save = false } = req.body;
+        if (save) {
+            await client.saveProfile(profile, false);
+            res.status(200).json({ saved: profile });
+        } else {
+            await client.loadProfile(profile, false);
+            res.status(200).json({ loaded: profile });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(err.message);
     }
 });
 
