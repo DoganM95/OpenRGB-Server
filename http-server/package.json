@@ -20,10 +20,10 @@
   },
   "homepage": "https://github.com/DoganM95/OpenRGB-Server#readme",
   "dependencies": {
-    "dotenv": "^17.0.1",
-    "express": "^5.1.0",
-    "morgan": "^1.10.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "morgan": "^1.10.1",
     "net": "^1.0.2",
-    "openrgb-sdk": "^0.5.2"
+    "openrgb-sdk": "^0.6.0"
   }
 }
