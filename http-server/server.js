@@ -31,7 +31,12 @@ app.use(async (req, res, next) => {
 
 // GET /devices – list all devices
 app.get("/devices", async (req, res) => {
-    res.status(200).json(req.devices);
+    try {
+        res.status(200).json(req.devices);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(err.message);
+    }
 });
 
 // GET /devices/:id – get all information of a single device
