@@ -2,17 +2,18 @@ const express = require("express");
 const morgan = require("morgan");
 require("dotenv").config({ path: __dirname + "/.env" });
 
-const { Client, utils } = require("openrgb-sdk");
+const { Client, Device, utils } = require("openrgb-sdk");
 
 const app = express({});
 app.use(express.json());
 app.use(morgan("dev"));
 
-const client = new Client("OpenRGB-REST-API", Number(process.env.OPENRGB_PORT) || 6742, process.env.OPENRGB_HOST || "127.0.0.1");
+const client = new Client("OpenRGB-REST-API", parseInt(process.env.OPENRGB_PORT) || 6742, process.env.OPENRGB_HOST || "0.0.0.0");
 
 app.use(async (req, res, next) => {
     try {
         await client.connect();
+        req.body.devices = await client.getAllControllerData();
     } catch (err) {
         return res.status(500).json({ error: "Failed to connect to OpenRGB: " + err.message });
     }
@@ -30,13 +31,13 @@ app.use(async (req, res, next) => {
 
 // GET /devices – list all devices
 app.get("/devices", async (req, res) => {
-    res.status(200).json(await client.getAllControllerData());
+    res.status(200).json(req.body.devices);
 });
 
 // GET /devices/:id – get single device info
 app.get("/devices/:id", async (req, res) => {
-    const id = parseInt(req.params.id);
-    res.status(200).json(await client.getControllerData(id));
+    const requestedDeviceId = parseInt(req.params.id);
+    res.status(200).json(req.body.devices.filter((device) => device.deviceId == requestedDeviceId));
 });
 
 // POST /devices/:id/mode – set native mode
@@ -49,19 +50,39 @@ app.post("/devices/:id/mode", async (req, res) => {
     res.status(200).json({ mode, saved: save });
 });
 
-// TODO
-// POST /devices/:id/leds – set all LEDs
-// Body: { colors: [{r,g,b}, ...] } or { color: "#ff00aa" }
-app.post("/devices/:id/leds", async (req, res) => {
-    const id = parseInt(req.params.id);
-    const ledIndex = parseInt(req.body.ledIndex);
-    if (req.body.color) {
-        await client.updateSingleLed(id, ledIndex, req.body.color);
-    } else if (req.body.colors) {
-        colors = Array(req.body.count || 1).fill(utils.hexColor(req.body.color));
-        await client.updateLeds(id, req.body.colors);
+// POST /devices/:id/leds – set a specific device's specific led
+// Body: { color: {red: 0, green: 155, blue:255 } }
+app.post("/devices/:id/led", async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        const ledIndex = parseInt(req.body?.ledIndex);
+        const red = parseInt(req.body?.color?.red);
+        const green = parseInt(req.body?.color?.green);
+        const blue = parseInt(req.body?.color?.blue);
+        client.updateSingleLed(id, ledIndex, utils.color(red, green, blue));
+        res.status(200).json({ leds: req.body.colors?.length || 1 });
+    } catch (err) {
+        console.error(err);
+        return res.status(500);
     }
-    res.status(200).json({ leds: req.body.colors?.length || 1 });
+});
+
+app.post("/devices/:id/leds", async (req, res) => {
+    try {
+        const deviceId = parseInt(req.params.id);
+        const red = parseInt(req.body?.color?.red);
+        const green = parseInt(req.body?.color?.green);
+        const blue = parseInt(req.body?.color?.blue);
+        const deviceData = await client.getControllerData(deviceId);
+        const ledCount = deviceData.leds.length;
+        const deviceName = deviceData.name;
+        // client.updateLeds(deviceId, Array(utils.color(red, green, blue))); // Buggy, does not set all led's of my mainboard
+        for (let ledIndex = 0; ledIndex < ledCount; ledIndex++) client.updateSingleLed(deviceId, ledIndex, utils.color(red, green, blue));
+        res.status(200).json({ deviceId: deviceId, deviceName: deviceName, leds: ledCount, color: { red: red, green: green, blue: blue } });
+    } catch (err) {
+        console.error(err);
+        return res.status(500);
+    }
 });
 
 // TODO
