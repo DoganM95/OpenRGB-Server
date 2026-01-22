@@ -35,7 +35,7 @@ app.get("/devices", async (req, res) => {
         return res.status(200).json(req.devices);
     } catch (err) {
         console.error(err);
-        res.status(500).send(err.message);
+        return res.status(500).send(err.message);
     }
 });
 
@@ -43,6 +43,8 @@ app.get("/devices", async (req, res) => {
 app.get("/devices/:id", async (req, res) => {
     try {
         const requestedDeviceId = parseInt(req.params.id);
+        if (requestedDeviceId < 0) return res.status(400).json({ error: "Id must be greater then 0." });
+        if (requestedDeviceId == NaN) return res.status(400).json({ error: "Id must be a valid number." });
         return res.status(200).json(req.devices.filter((device) => device.deviceId == requestedDeviceId));
     } catch (err) {
         console.error(err);
