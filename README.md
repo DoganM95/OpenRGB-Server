@@ -42,6 +42,72 @@ docker run -d \
 - `-e "OPENRGB_PORT=<port>"`: `<port>` defines the port the tcp server serves on, in the example above exposed as `6742`
 - `-p x:3000`: `x` defines the port this http server should be accessible on, in this case 6744
 
+## Rest Api
+
+### Getting all devices
+
+`GET` /devices
+
+Retrieves the full list of all compatible hardware on the host machine, returned as a JSON
+
+### Getting info for a specific device
+
+`GET` /devices/:id
+
+Retrieves the details for only the hardware specified by its id, returned as a JSON
+
+### Setting RGB lighting
+
+`POST` /devices/:id/leds
+
+Sets the RGB led light colors & effects for a specific or all led's at once.  
+Values are case insensitive, trying a non-existing mode will return valid options.
+Returns the result as a JSON, e.g.:  
+
+```json
+{
+    "deviceId": 0,
+    "deviceName": "X570 I AORUS PRO WIFI",
+    "leds": 5,
+    "color": {
+        "red": 255,
+        "green": 255,
+        "blue": 0
+    },
+    "mode": "direct"
+}
+```
+
+Request Examples:
+
+#### Set the last led to steady red
+
+```json
+{
+    "color": {
+        "red": 255,
+        "green": 0,
+        "blue": 0
+    },
+    "mode": "direct",
+    "ledIndex": "0"
+}
+```
+
+#### Set all led's to breathing dim green
+
+```json
+{
+    "color": {
+        "red": 0,
+        "green": 100,
+        "blue": 0
+    },
+    "mode": "breathing",
+    "ledIndex": "x"
+}
+```
+
 ### Test CLI Compatibility
 
 Check if your machine's RGB devices can be controlled inside the container. If OpenRGB works on your host, this usually works too.
