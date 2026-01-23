@@ -52,70 +52,53 @@ app.get("/devices/:id", async (req, res) => {
     }
 });
 
-// POST /devices/:id/mode – set native mode
-// Body: { mode: <id or name>, save?: boolean }
-app.post("/devices/:id/mode", async (req, res) => {
-    try {
-        const id = parseInt(req.params.id);
-        const { mode, save = false } = req.body;
-        await client.updateMode(id, mode);
-        if (save) await client.saveMode(id);
-        return res.status(200).json({ mode, saved: save });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).send(err.message);
-    }
-});
-
-// POST /devices/:id/leds – set a specific device's specific led
-// Body: { color: {red: 0, green: 155, blue:255 } }
-app.post("/devices/:id/led", async (req, res) => {
-    try {
-        const id = parseInt(req.params.id);
-        const ledIndex = parseInt(req.body?.ledIndex);
-        const red = parseInt(req.body?.color?.red);
-        const green = parseInt(req.body?.color?.green);
-        const blue = parseInt(req.body?.color?.blue);
-        client.updateSingleLed(id, ledIndex, utils.color(red, green, blue));
-        return res.status(200).json({ leds: req.body.colors?.length || 1 });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).send(err.message);
-    }
-});
-
+// POST /devices/:id/leds – set led's of a specific device (pc component, such as mainboard, ram, etc)
+// Body example: { color: {red: 100, green: 100, blue: 100 }, mode: "Breathing", ledIndex: X }
 app.post("/devices/:id/leds", async (req, res) => {
     try {
-        const deviceId = parseInt(req.params.id);
+        const requestedDeviceId = parseInt(req.params.id);
+        if (requestedDeviceId < 0 || Number.isNaN(requestedDeviceId) || requestedDeviceId === undefined) {
+            return res.status(400).json({ error: "Device index (id) must be greater than 0." });
+        }
+
+        const ledIndex = String(req.body?.ledIndex).toLowerCase() == "x" ? String(req.body?.ledIndex).toLowerCase() : parseInt(req.body?.ledIndex);
+        if (ledIndex < 0 || Number.isNaN(ledIndex) || ledIndex === undefined) {
+            return res.status(400).json({ error: "Led index (id) must be greater than 0." });
+        }
+
         const red = parseInt(req.body?.color?.red);
         const green = parseInt(req.body?.color?.green);
         const blue = parseInt(req.body?.color?.blue);
-        const deviceData = await client.getControllerData(deviceId);
-        const ledCount = deviceData.leds.length;
-        const deviceName = deviceData.name;
-        // client.updateLeds(deviceId, Array(utils.color(red, green, blue))); // Buggy, does not set all led's of my mainboard
-        for (let ledIndex = 0; ledIndex < ledCount; ledIndex++) client.updateSingleLed(deviceId, ledIndex, utils.color(red, green, blue));
-        return res.status(200).json({ deviceId: deviceId, deviceName: deviceName, leds: ledCount, color: { red: red, green: green, blue: blue } });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).send(err.message);
-    }
-});
+        if (!(red >= 0 && red <= 255 && green >= 0 && green <= 255 && blue >= 0 && blue <= 255)) {
+            return res.status(400).json({ error: "Each color must be in the range of 0 to 255." });
+        }
 
-// TODO
-// POST /devices/:id/color-all – set same color everywhere
-// Body: { color: "#00ff00" or {r,g,b} }
-app.post("/devices/:id/color-all", async (req, res) => {
-    try {
-        const id = parseInt(req.params.id);
-        const c = req.body.color;
-        const color = typeof c === "string" ? utils.hexColor(c) : utils.color(c.red, c.green, c.blue);
-        const colorArray = Array.from(color);
-        await client.updateLeds(id, colorArray);
-        return res.status(200).json({ color: colorArray });
+        const deviceData = req.devices.find((device) => device.deviceId == requestedDeviceId);
+
+        const mode = req.body?.mode;
+        const modes = req.devices.find((device) => device.deviceId == requestedDeviceId).modes.map((mode) => mode.name);
+        if (!modes.map((m) => m.toLowerCase()).includes(mode.toLowerCase())) {
+            return res.status(400).json({ error: `Wrong mode attribute. Supported modes for device ${requestedDeviceId} are ${modes}` });
+        }
+
+        const ledCount = deviceData.leds?.length;
+
+        // Update single led only if index is a number
+        if (ledIndex !== "x") {
+            client.updateSingleLed(requestedDeviceId, ledIndex, utils.color(red, green, blue));
+            await client.updateMode(requestedDeviceId, mode);
+            return res.status(200).json({ deviceId: requestedDeviceId, deviceName: deviceData.name, leds: ledCount, color: { red: red, green: green, blue: blue }, mode: mode });
+        }
+
+        // Update all led's of the given device if index == "x"
+        for (let ledIndex = 0; ledIndex < ledCount; ledIndex++) {
+            client.updateSingleLed(requestedDeviceId, ledIndex, utils.color(red, green, blue));
+            await client.updateMode(requestedDeviceId, mode);
+        }
+        return res.status(200).json({ deviceId: requestedDeviceId, deviceName: deviceData.name, leds: ledCount, color: { red: red, green: green, blue: blue }, mode: mode });
     } catch (err) {
         console.error(err);
-        return res.status(500).send(err.message);
+        return res.status(500).json({ error: err.message });
     }
 });
 
