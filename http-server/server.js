@@ -10,6 +10,12 @@ app.use(morgan("dev"));
 
 const client = new Client("OpenRGB-REST-API", parseInt(process.env.OPENRGB_PORT) || 6742, process.env.OPENRGB_HOST || "0.0.0.0");
 
+const resolveIndices = (indices, maxCount) => {
+    if (!indices || indices.length === 0) return [];
+    if (indices[0] === -1) return Array.from({ length: maxCount }, (value, key) => key);
+    return indices;
+};
+
 app.use(async (req, res, next) => {
     try {
         await client.connect();
@@ -50,6 +56,44 @@ app.get("/devices/:id", async (req, res) => {
         console.error(err);
         return res.status(500).send(err.message);
     }
+});
+
+app.post("/", async (req, res) => {
+    const { deviceIndices, zoneIndices, ledIndices, mode, color, colors } = req.body;
+    const devices = client.devices; // assume already populated
+    const resolvedDevices = resolveIndices(deviceIndices, devices.length);
+
+    for (const deviceId of resolvedDevices) {
+        const device = devices[deviceId];
+        if (!device) continue;
+        if (mode) await client.updateMode(deviceId, mode);
+        const resolvedZones = resolveIndices(zoneIndices, device.zones.length);
+        const resolvedLeds = resolveIndices(ledIndices, device.leds.length);
+        const rgbColor = color ? utils.hexColor(color) : null;
+
+        // Specific LED's only, if set
+        if (resolvedLeds.length > 0) {
+            for (const ledId of resolvedLeds) await client.updateSingleLed(deviceId, ledId, rgbColor);
+            continue;
+        }
+
+        // Specific zones only, if set
+        if (resolvedZones.length > 0) {
+            for (const zoneId of resolvedZones) {
+                const zone = device.zones[zoneId];
+                if (!zone) continue;
+                const zoneColors = colors ? colors.map(utils.hexColor) : Array(zone.ledsCount).fill(rgbColor);
+                await client.updateZoneLeds(deviceId, zoneId, zoneColors);
+            }
+            continue;
+        }
+
+        // Whole device otherwise
+        const deviceColors = colors ? colors.map(utils.hexColor) : Array(device.leds.length).fill(rgbColor);
+        await client.updateLeds(deviceId, deviceColors);
+    }
+
+    res.status(200).json({ success: true });
 });
 
 // POST /devices/:id/leds – set led's of a specific device (pc component, such as mainboard, ram, etc)
