@@ -112,6 +112,7 @@ app.post("/", async (req, res) => {
     }
 });
 
+// XXX LEGACY endpoint, will be removed soon
 // POST /devices/:id/leds – set led's of a specific device (pc component, such as mainboard, ram, etc)
 // Body example: { color: {red: 100, green: 100, blue: 100 }, mode: "Breathing", ledIndex: X }
 app.post("/devices/:id/leds", async (req, res) => {
@@ -159,25 +160,6 @@ app.post("/devices/:id/leds", async (req, res) => {
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: err.message });
-    }
-});
-
-// TODO
-// POST /devices/:id/zone/:zoneId – set zone color(s)
-// Body: { colors: [...], fast?: boolean }
-app.post("/devices/:id/zone/:zoneId", async (req, res) => {
-    try {
-        const id = parseInt(req.params.id);
-        const zoneId = parseInt(req.params.zoneId);
-        const { colors, fast = false } = req.body;
-        const device = (await client.getAllControllerData())[id];
-        const zone = device.zones.find((z) => z.id === zoneId);
-        if (!zone) throw new Error("Zone not found");
-        await client.updateZoneColors(id, zoneId, colors, fast);
-        return res.status(200).json({ zone: zoneId });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).send(err.message);
     }
 });
 
