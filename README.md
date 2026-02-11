@@ -75,37 +75,23 @@ Request Examples:
 ```json
 [
     {
-        "deviceIndices": [
-            0
-        ],
-        "zoneIndices": [
-            -1
-        ],
+        "deviceIndices": [0],
+        "zoneIndices": [-1],
         "color": "#ff0000",
         "mode": "direct"
     },
     {
-        "deviceIndices": [
-            1
-        ],
-        "zoneIndices": [
-            0,
-            2
-        ],
+        "deviceIndices": [1],
+        "zoneIndices": [0, 2],
         "color": "#0000ff"
     },
     {
-        "deviceIndices": [
-            2
-        ],
-        "ledIndices": [
-            1,
-            3,
-            5
-        ],
+        "deviceIndices": [2],
+        "ledIndices": [1, 3, 5],
         "color": "#ff0000"
     }
 ]
+
 ```
 
 
@@ -118,12 +104,11 @@ All devices (and all their led's) to red:
 ```json
 [
     {
-        "deviceIndices": [
-            -1
-        ],
+        "deviceIndices": [-1],
         "color": "#ff0000"
     }
 ]
+
 ```
 
 All zones of a specific device to red:
@@ -131,15 +116,12 @@ All zones of a specific device to red:
 ```json
 [
     {
-        "deviceIndices": [
-            0
-        ],
-        "zoneIndices": [
-            -1
-        ],
+        "deviceIndices": [0],
+        "zoneIndices": [-1],
         "color": "#ff0000"
     }
 ]
+
 ```
 
 All led's of a specific zone to red:
@@ -147,18 +129,13 @@ All led's of a specific zone to red:
 ```json
 [
     {
-        "deviceIndices": [
-            0
-        ],
-        "zoneIndices": [
-            2
-        ],
-        "ledIndices":[
-            -1
-        ]
+        "deviceIndices": [0],
+        "zoneIndices": [2],
+        "ledIndices": [-1],
         "color": "#ff0000"
     }
 ]
+
 ```
 
 ### Test CLI Compatibility
