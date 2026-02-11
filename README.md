@@ -58,54 +58,107 @@ Retrieves the details for only the hardware specified by its id, returned as a J
 
 ### Setting RGB lighting
 
-`POST` /devices/:id/leds
+`POST` /
 
 Sets the RGB led light colors & effects for a specific or all led's at once.  
-Values are case insensitive, trying a non-existing mode will return valid options.
-Returns the result as a JSON, e.g.:  
-
-```json
-{
-    "deviceId": 0,
-    "deviceName": "X570 I AORUS PRO WIFI",
-    "leds": 5,
-    "color": {
-        "red": 255,
-        "green": 255,
-        "blue": 0
-    },
-    "mode": "direct"
-}
-```
+Values are case insensitive, payload is an array of objects. 
+Most combinations just work out of the box, reading the examples should help understanding how.
 
 Request Examples:
 
-#### Set the last led to steady red
+#### Granular control of each device, zone & led
+
+- Set Device 0's all zones to red (=ff0000) with static light (=direct)
+- Set device 1's zones 0 & 2 to blue while keeping its current mode (effect)
+- Set Device 3's individual led's to green, also keeping current effect
 
 ```json
-{
-    "color": {
-        "red": 255,
-        "green": 0,
-        "blue": 0
+[
+    {
+        "deviceIndices": [
+            0
+        ],
+        "zoneIndices": [
+            -1
+        ],
+        "color": "#ff0000",
+        "mode": "direct"
     },
-    "mode": "direct",
-    "ledIndex": "0"
-}
+    {
+        "deviceIndices": [
+            1
+        ],
+        "zoneIndices": [
+            0,
+            2
+        ],
+        "color": "#0000ff"
+    },
+    {
+        "deviceIndices": [
+            2
+        ],
+        "ledIndices": [
+            1,
+            3,
+            5
+        ],
+        "color": "#ff0000"
+    }
+]
 ```
 
-#### Set all led's to breathing dim green
+
+#### Setting all devices at once
+
+Use the index value `-1` to reference all devices, all zones or all led's, e.g.
+
+All devices (and all their led's) to red:
 
 ```json
-{
-    "color": {
-        "red": 0,
-        "green": 100,
-        "blue": 0
-    },
-    "mode": "breathing",
-    "ledIndex": "x"
-}
+[
+    {
+        "deviceIndices": [
+            -1
+        ],
+        "color": "#ff0000"
+    }
+]
+```
+
+All zones of a specific device to red:
+
+```json
+[
+    {
+        "deviceIndices": [
+            0
+        ],
+        "zoneIndices": [
+            -1
+        ],
+        "color": "#ff0000"
+    }
+]
+```
+
+All led's of a specific zone to red:
+
+```json
+[
+    {
+        "deviceIndices": [
+            0
+        ],
+        "zoneIndices": [
+            2
+        ],
+        "ledIndices":[
+            -1
+        ]
+        "color": "#ff0000"
+    }
+]
 ```
 
 ### Test CLI Compatibility
