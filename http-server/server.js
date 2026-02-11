@@ -10,9 +10,9 @@ app.use(morgan("dev"));
 
 const client = new Client("OpenRGB-REST-API", parseInt(process.env.OPENRGB_PORT) || 6742, process.env.OPENRGB_HOST || "0.0.0.0");
 
-const resolveIndices = (indices, maxCount) => {
-    if (!indices || indices.length === 0) return [];
-    if (indices[0] === -1) return Array.from({ length: maxCount }, (value, key) => key);
+const resolveIndices = (indices, maxCount = 0) => {
+    if (!Array.isArray(indices) || indices.length === 0) return [];
+    if (indices[0] === -1) return Array.from({ length: maxCount }, (valu, key) => key);
     return indices;
 };
 
