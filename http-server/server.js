@@ -59,41 +59,54 @@ app.get("/devices/:id", async (req, res) => {
 });
 
 app.post("/", async (req, res) => {
-    const { deviceIndices, zoneIndices, ledIndices, mode, color, colors } = req.body;
-    const devices = client.devices; // assume already populated
-    const resolvedDevices = resolveIndices(deviceIndices, devices.length);
+    try {
+        const { deviceIndices, zoneIndices, ledIndices, mode, color, colors } = req.body;
+        if (!client.devices) return res.status(500).json({ error: "Devices not initialized" });
+        const devices = client.devices;
+        const resolvedDevices = resolveIndices(deviceIndices, devices.length);
 
-    for (const deviceId of resolvedDevices) {
-        const device = devices[deviceId];
-        if (!device) continue;
-        if (mode) await client.updateMode(deviceId, mode);
-        const resolvedZones = resolveIndices(zoneIndices, device.zones.length);
-        const resolvedLeds = resolveIndices(ledIndices, device.leds.length);
-        const rgbColor = color ? utils.hexColor(color) : null;
+        for (const deviceId of resolvedDevices) {
+            const device = devices[deviceId];
+            if (!device) continue;
+            if (mode) await client.updateMode(deviceId, mode);
 
-        // Specific LED's only, if set
-        if (resolvedLeds.length > 0) {
-            for (const ledId of resolvedLeds) await client.updateSingleLed(deviceId, ledId, rgbColor);
-            continue;
-        }
+            const zones = device.zones || [];
+            const leds = device.leds || [];
+            const resolvedZones = resolveIndices(zoneIndices, zones.length);
+            const resolvedLeds = resolveIndices(ledIndices, leds.length);
+            const rgbColor = color ? utils.hexColor(color) : null;
 
-        // Specific zones only, if set
-        if (resolvedZones.length > 0) {
-            for (const zoneId of resolvedZones) {
-                const zone = device.zones[zoneId];
-                if (!zone) continue;
-                const zoneColors = colors ? colors.map(utils.hexColor) : Array(zone.ledsCount).fill(rgbColor);
-                await client.updateZoneLeds(deviceId, zoneId, zoneColors);
+            // Specific LEDs
+            if (resolvedLeds.length > 0) {
+                for (const ledId of resolvedLeds) {
+                    if (ledId >= leds.length) continue;
+                    await client.updateSingleLed(deviceId, ledId, rgbColor);
+                }
+                continue;
             }
-            continue;
+
+            // Specific Zones
+            if (resolvedZones.length > 0) {
+                for (const zoneId of resolvedZones) {
+                    const zone = zones[zoneId];
+                    if (!zone) continue;
+                    const zoneLedCount = zone.ledsCount || 0;
+                    const zoneColors = colors ? colors.map(utils.hexColor) : Array(zoneLedCount).fill(rgbColor);
+                    await client.updateZoneLeds(deviceId, zoneId, zoneColors);
+                }
+                continue;
+            }
+
+            // Whole device
+            const deviceColors = colors ? colors.map(utils.hexColor) : Array(leds.length).fill(rgbColor);
+            await client.updateLeds(deviceId, deviceColors);
         }
 
-        // Whole device otherwise
-        const deviceColors = colors ? colors.map(utils.hexColor) : Array(device.leds.length).fill(rgbColor);
-        await client.updateLeds(deviceId, deviceColors);
+        res.status(200).json({ success: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
     }
-
-    res.status(200).json({ success: true });
 });
 
 // POST /devices/:id/leds – set led's of a specific device (pc component, such as mainboard, ram, etc)
