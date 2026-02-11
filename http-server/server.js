@@ -1,6 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
-require("dotenv").config({ path: __dirname + "/.env" });
+require("dotenv").config({ path: __dirname + "/.env", quiet: true });
 
 const { Client, Device, utils } = require("openrgb-sdk");
 
@@ -60,45 +60,49 @@ app.get("/devices/:id", async (req, res) => {
 
 app.post("/", async (req, res) => {
     try {
-        const { deviceIndices, zoneIndices, ledIndices, mode, color, colors } = req.body;
+        const requests = req.body; // Now we expect an array of requests
         const devices = req.devices;
-        const resolvedDevices = resolveIndices(deviceIndices, devices.length);
 
-        for (const deviceId of resolvedDevices) {
-            const device = devices[deviceId];
-            if (!device) continue;
-            if (mode) await client.updateMode(deviceId, mode);
+        for (const request of requests) {
+            const { deviceIndices, zoneIndices, ledIndices, mode, color, colors } = request;
+            const resolvedDevices = resolveIndices(deviceIndices, devices.length);
 
-            const zones = device.zones || [];
-            const leds = device.leds || [];
-            const resolvedZones = resolveIndices(zoneIndices, zones.length);
-            const resolvedLeds = resolveIndices(ledIndices, leds.length);
-            const rgbColor = color ? utils.hexColor(color) : null;
+            for (const deviceId of resolvedDevices) {
+                const device = devices[deviceId];
+                if (!device) continue;
+                if (mode) await client.updateMode(deviceId, mode);
 
-            // Specific LEDs
-            if (resolvedLeds.length > 0) {
-                for (const ledId of resolvedLeds) {
-                    if (ledId >= leds.length) continue;
-                    await client.updateSingleLed(deviceId, ledId, rgbColor);
+                const zones = device.zones || [];
+                const leds = device.leds || [];
+                const resolvedZones = resolveIndices(zoneIndices, zones.length);
+                const resolvedLeds = resolveIndices(ledIndices, leds.length);
+                const rgbColor = color ? utils.hexColor(color) : null;
+
+                // Specific LEDs
+                if (resolvedLeds.length > 0) {
+                    for (const ledId of resolvedLeds) {
+                        if (ledId >= leds.length) continue;
+                        await client.updateSingleLed(deviceId, ledId, rgbColor);
+                    }
+                    continue;
                 }
-                continue;
-            }
 
-            // Specific Zones
-            if (resolvedZones.length > 0) {
-                for (const zoneId of resolvedZones) {
-                    const zone = zones[zoneId];
-                    if (!zone) continue;
-                    const zoneLedCount = zone.ledsCount || 0;
-                    const zoneColors = colors ? colors.map(utils.hexColor) : Array(zoneLedCount).fill(rgbColor);
-                    await client.updateZoneLeds(deviceId, zoneId, zoneColors);
+                // Specific Zones
+                if (resolvedZones.length > 0) {
+                    for (const zoneId of resolvedZones) {
+                        const zone = zones[zoneId];
+                        if (!zone) continue;
+                        const zoneLedCount = zone.ledsCount || 0;
+                        const zoneColors = colors ? colors.map(utils.hexColor) : Array(zoneLedCount).fill(rgbColor);
+                        await client.updateZoneLeds(deviceId, zoneId, zoneColors);
+                    }
+                    continue;
                 }
-                continue;
-            }
 
-            // Whole device
-            const deviceColors = colors ? colors.map(utils.hexColor) : Array(leds.length).fill(rgbColor);
-            await client.updateLeds(deviceId, deviceColors);
+                // Whole device
+                const deviceColors = colors ? colors.map(utils.hexColor) : Array(leds.length).fill(rgbColor);
+                await client.updateLeds(deviceId, deviceColors);
+            }
         }
 
         res.status(200).json({ success: true });
