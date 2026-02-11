@@ -69,8 +69,8 @@ Request Examples:
 #### Granular control of each device, zone & led
 
 - Set Device 0's all zones to red (=ff0000) with static light (=direct)
-- Set device 1's zones 0 & 2 to blue while keeping its current mode (effect)
-- Set Device 3's individual led's to green, also keeping current effect
+- Set device 1 & 2's zones 0 & 2 to blue while keeping their current modes (effect)
+- Set Device 3's individual led's 1,3,5 to green, also keeping current effect
 
 ```json
 [
@@ -81,12 +81,12 @@ Request Examples:
         "mode": "direct"
     },
     {
-        "deviceIndices": [1],
+        "deviceIndices": [1,2],
         "zoneIndices": [0, 2],
         "color": "#0000ff"
     },
     {
-        "deviceIndices": [2],
+        "deviceIndices": [3],
         "ledIndices": [1, 3, 5],
         "color": "#ff0000"
     }
