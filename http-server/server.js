@@ -21,7 +21,7 @@ app.use(async (req, res, next) => {
         await client.connect();
         req.devices = await client.getAllControllerData();
     } catch (err) {
-        return res.status(500).json({ error: "Failed to connect to OpenRGB: " + err.message });
+        return res.status(500).json({ error: "Failed to connect to OpenRGB: " + err.message, stacktrace: err });
     }
 
     res.on("finish", async () => {
