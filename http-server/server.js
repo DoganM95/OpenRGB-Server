@@ -183,4 +183,4 @@ app.post("/devices/:id/profile", async (req, res) => {
     }
 });
 
-app.listen(3333, () => console.log("OpenRGB REST API running at http://localhost:3000"));
+app.listen(3000, () => console.log("OpenRGB REST API running at http://localhost:3000"));
