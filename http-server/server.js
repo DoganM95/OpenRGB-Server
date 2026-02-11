@@ -12,7 +12,7 @@ const client = new Client("OpenRGB-REST-API", parseInt(process.env.OPENRGB_PORT)
 
 const resolveIndices = (indices, maxCount = 0) => {
     if (!Array.isArray(indices) || indices.length === 0) return [];
-    if (indices[0] === -1) return Array.from({ length: maxCount }, (valu, key) => key);
+    if (indices[0] === -1) return Array.from({ length: maxCount }, (value, key) => key);
     return indices;
 };
 
@@ -61,8 +61,7 @@ app.get("/devices/:id", async (req, res) => {
 app.post("/", async (req, res) => {
     try {
         const { deviceIndices, zoneIndices, ledIndices, mode, color, colors } = req.body;
-        if (!client.devices) return res.status(500).json({ error: "Devices not initialized" });
-        const devices = client.devices;
+        const devices = req.devices;
         const resolvedDevices = resolveIndices(deviceIndices, devices.length);
 
         for (const deviceId of resolvedDevices) {
@@ -198,4 +197,4 @@ app.post("/devices/:id/profile", async (req, res) => {
     }
 });
 
-app.listen(3000, () => console.log("OpenRGB REST API running at http://localhost:3000"));
+app.listen(3333, () => console.log("OpenRGB REST API running at http://localhost:3000"));
