@@ -68,7 +68,7 @@ Request Examples:
 
 #### Granular control of each device, zone & led
 
-- Set Device 0's all zones to red (=ff0000) with static light (=direct)
+- Set Device 0's all zones to red (=ff0000) with static light (=direct) and led count of zone 0 as 9 (addressable strip)
 - Set device 1 & 2's zones 0 & 2 to blue while keeping their current modes (effect)
 - Set Device 3's individual led's 1,3,5 to green, also keeping current effect
 
@@ -77,6 +77,9 @@ Request Examples:
     {
         "deviceIndices": [0],
         "zoneIndices": [-1],
+        "resizeZones": {
+            "0": 9
+        },
         "color": "#ff0000",
         "mode": "direct"
     },
