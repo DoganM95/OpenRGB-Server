@@ -82,7 +82,7 @@ app.post("/", async (req, res) => {
                 if (resolvedLeds.length > 0) {
                     for (const ledId of resolvedLeds) {
                         if (ledId >= leds.length) continue;
-                        await client.updateSingleLed(deviceId, ledId, rgbColor);
+                        client.updateSingleLed(deviceId, ledId, rgbColor);
                     }
                     continue;
                 }
@@ -92,16 +92,18 @@ app.post("/", async (req, res) => {
                     for (const zoneId of resolvedZones) {
                         const zone = zones[zoneId];
                         if (!zone) continue;
-                        const zoneLedCount = zone.ledsCount || 0;
+                        const resizeTo = request.resizeZones?.[zoneId];
+                        if (resizeTo != null) client.resizeZone(deviceId, zoneId, resizeTo);
+                        const zoneLedCount = (resizeTo ?? zone.ledsCount) || 0;
                         const zoneColors = colors ? colors.map(utils.hexColor) : Array(zoneLedCount).fill(rgbColor);
-                        await client.updateZoneLeds(deviceId, zoneId, zoneColors);
+                        client.updateZoneLeds(deviceId, zoneId, zoneColors);
                     }
                     continue;
                 }
 
                 // Whole device
                 const deviceColors = colors ? colors.map(utils.hexColor) : Array(leds.length).fill(rgbColor);
-                await client.updateLeds(deviceId, deviceColors);
+                client.updateLeds(deviceId, deviceColors);
             }
         }
 
@@ -112,4 +114,5 @@ app.post("/", async (req, res) => {
     }
 });
 
-app.listen(3000, () => console.log("OpenRGB REST API running at http://localhost:3000"));
+const port = 3333;
+app.listen(port, () => console.log(`OpenRGB REST API running at http://localhost:${port}`));
