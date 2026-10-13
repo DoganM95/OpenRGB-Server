@@ -118,5 +118,5 @@ app.post("/", async (req, res) => {
     }
 });
 
-const port = 3333;
+const port = 3000;
 app.listen(port, () => console.log(`OpenRGB REST API running at http://localhost:${port}`));
