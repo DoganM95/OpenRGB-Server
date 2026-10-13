@@ -8,7 +8,7 @@ const app = express({});
 app.use(express.json());
 app.use(morgan("dev"));
 
-const client = new Client("OpenRGB-REST-API", parseInt(process.env.OPENRGB_PORT) || 6742, process.env.OPENRGB_HOST || "0.0.0.0");
+const createClient = () => new Client("OpenRGB-REST-API", parseInt(process.env.OPENRGB_PORT) || 6742, process.env.OPENRGB_HOST || "0.0.0.0");
 
 const resolveIndices = (indices, maxCount = 0) => {
     if (!Array.isArray(indices) || indices.length === 0) return [];
@@ -16,15 +16,18 @@ const resolveIndices = (indices, maxCount = 0) => {
     return indices;
 };
 
+// One connection per request: a shared client breaks on concurrent requests (each connect() replaces its socket)
 app.use(async (req, res, next) => {
+    const client = (req.client = createClient());
     try {
         await client.connect();
         req.devices = await client.getAllControllerData();
     } catch (err) {
+        client.disconnect();
         return res.status(500).json({ error: "Failed to connect to OpenRGB: " + err.message, stacktrace: err });
     }
 
-    res.on("finish", async () => {
+    res.on("close", () => {
         try {
             client.disconnect();
         } catch {
@@ -62,6 +65,7 @@ app.post("/", async (req, res) => {
     try {
         const requests = req.body; // Now we expect an array of requests
         const devices = req.devices;
+        const client = req.client;
 
         for (const request of requests) {
             const { deviceIndices, zoneIndices, ledIndices, mode, color, colors } = request;
